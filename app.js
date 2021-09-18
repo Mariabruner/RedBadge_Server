@@ -9,6 +9,7 @@ app.use(Express.json())
 
 app.use("/user", controllers.userController)
 app.use("/character", controllers.characterController)
+app.use("/fight", controllers.fightController)
 
 app.use(require("./middleware/validate-jwt"))
 

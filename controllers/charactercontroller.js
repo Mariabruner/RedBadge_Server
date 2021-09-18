@@ -2,6 +2,7 @@ const Express = require("express")
 const router = Express.Router()
 const { CharacterModel } = require("../models")
 const { UniqueConstraintError, EmptyResultError } = require("sequelize/lib/errors")
+const { userController } = require(".")
 
 //create new character
 router.post("/create", async (req, res) => {
