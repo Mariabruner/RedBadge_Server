@@ -8,12 +8,13 @@ const controllers = require("./controllers")
 app.use(Express.json())
 
 app.use("/user", controllers.userController)
+app.use("/character", controllers.characterController)
 
 app.use(require("./middleware/validate-jwt"))
 
 
 dbConnection.authenticate()
-    .then(() => dbConnection.sync())
+    .then(() => dbConnection.sync(force=true))
     .then(() => {
         app.listen(3000, () => {
             console.log(`[Server]: App is listening on 3000.`)
