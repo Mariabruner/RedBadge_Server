@@ -2,26 +2,31 @@ const Express = require("express")
 const router = Express.Router()
 const { FightModel } = require("../models")
 const { UniqueConstraintError, EmptyResultError } = require("sequelize/lib/errors")
+const Character = require("../models/character")
+const Fight = require("../models/fight")
+const { userController } = require(".")
+
+let validateJWT = require('../middleware/validate-jwt')
+
 
 //Create a new fight combo
 router.post("/create", async (req, res) => {
-    let { contestantOne, contestantTwo } = req.body.fight
-
     //check if fight already exists
     query = {
         where: {
-            contestantOne: contestantOne,
-            contestantTwo: contestantTwo
+            characterOneId: req.body.characterOneId,
+            characterTwoId: req.body.characterTwoId
         }
     }
-    result = await FightModel.findOne(query)
+    result = await FightModel.findAll(query)
+    console.log("line 16", result[0])
 
-    if (result === null) {
+    if (!result[0]) {
         //create new fight if fight does not exist
         try {
             const Fight = await FightModel.create({
-                contestantOne,
-                contestantTwo,
+                characterOneId: req.body.characterOneId,
+                characterTwoId: req.body.characterTwoId,
                 numFaceOffs: 0,
                 characterOneWins: 0,
                 characterTwoWins: 0
@@ -37,21 +42,35 @@ router.post("/create", async (req, res) => {
         }
     } else {
         //response if fight already exists
+        console.log(result)
         res.status(500).json({
             message: "Fight combo already exists"
         })
     }
 })
 
+// router.get("/character/:cid", async(req, res) => {
+//     try {
+//         const character = await Character.findAll({
+//             where: { id: req.params.cid },
+//             include: { 
+//                 model: FightModel
+//             }
+//         })
+//         res.json(character)
+//     } catch (err) {
+//         res.json({ error: err })
+//     }
+// })
+
 //Get a fight combo using both character ids
 router.get("/find", async (req, res) => {
-    let { contestantOne, contestantTwo } = req.body.fight
 
     try {
     query = {
         where: {
-            contestantOne: contestantOne,
-            contestantTwo: contestantTwo
+            characterOneId: req.body.characterOneId,
+            characterTwoId: req.body.characterTwoId
         }
     }
         result = await FightModel.findOne(query)
@@ -65,11 +84,11 @@ router.get("/find", async (req, res) => {
 
 //Update a character's win count and total number of face offs
 router.put("/updateWins", async (req, res) => {
-    const { contestantOne, contestantTwo, winnerID } = req.body.fight
+    const { winnerID } = req.body.fight
     query = {
         where: {
-            contestantOne: contestantOne,
-            contestantTwo: contestantTwo
+            characterOneId: req.body.characterOneId,
+            characterTwoId: req.body.characterTwoId
         }
     }
     result = await FightModel.findOne(query)
@@ -86,8 +105,8 @@ router.put("/updateWins", async (req, res) => {
     let updatedFaceOffs = result.numFaceOffs + 1
 
     updatedFight = {
-        contestantOne: result.contestantOne,
-        contestantTwo: result.contestantTwo,
+        characterOneId: result.characterOneId,
+        characterTwoId: result.characterTwoId,
         numFaceOffs: updatedFaceOffs,
         characterOneWins: updatedCharOneWins,
         characterTwoWins: updatedCharTwoWins
@@ -101,4 +120,22 @@ router.put("/updateWins", async (req, res) => {
     }
 })
 
+
+//delete a fight combo
+router.delete("/delete/:id", async (req, res) => {
+    const { id } = req.params
+
+    const query = {
+        where: {
+            id: id
+        }
+    }
+
+    try {
+        await FightModel.destroy(query)
+        res.status(200).json({ message: "Fight removed" })
+    } catch (err) {
+        res.status(500).json({ message: "Fight not removed" })
+    }
+})
 module.exports = router
