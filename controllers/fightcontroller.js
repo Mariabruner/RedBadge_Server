@@ -2,7 +2,6 @@ const Express = require("express")
 const router = Express.Router()
 const { FightModel } = require("../models")
 const { UniqueConstraintError, EmptyResultError } = require("sequelize/lib/errors")
-const Character = require("../models/character")
 const Fight = require("../models/fight")
 const { userController } = require(".")
 
@@ -14,8 +13,8 @@ router.post("/create", async (req, res) => {
     //check if fight already exists
     query = {
         where: {
-            characterOneId: req.body.characterOneId,
-            characterTwoId: req.body.characterTwoId
+            characterOneId: req.body.fight.characterOneId,
+            characterTwoId: req.body.fight.characterTwoId
         }
     }
     result = await FightModel.findAll(query)
@@ -25,8 +24,8 @@ router.post("/create", async (req, res) => {
         //create new fight if fight does not exist
         try {
             const Fight = await FightModel.create({
-                characterOneId: req.body.characterOneId,
-                characterTwoId: req.body.characterTwoId,
+                characterOneId: req.body.fight.characterOneId,
+                characterTwoId: req.body.fight.characterTwoId,
                 numFaceOffs: 0,
                 characterOneWins: 0,
                 characterTwoWins: 0
@@ -48,6 +47,7 @@ router.post("/create", async (req, res) => {
         })
     }
 })
+
 
 // router.get("/character/:cid", async(req, res) => {
 //     try {
@@ -83,12 +83,12 @@ router.get("/find", async (req, res) => {
 })
 
 //Update a character's win count and total number of face offs
-router.put("/updateWins", async (req, res) => {
-    const { winnerID } = req.body.fight
+router.put("/updateWins/:wid/:c1id/:c2id", async (req, res) => {
+    const { wid, c1id, c2id } = req.params
     query = {
         where: {
-            characterOneId: req.body.characterOneId,
-            characterTwoId: req.body.characterTwoId
+            characterOneId: c1id,
+            characterTwoId: c2id
         }
     }
     result = await FightModel.findOne(query)
@@ -97,9 +97,9 @@ router.put("/updateWins", async (req, res) => {
     let updatedCharTwoWins = result.characterTwoWins
 
     //update appropriate character's win count
-    if (winnerID === contestantOne) {
+    if (wid === c1id) {
         updatedCharOneWins = updatedCharOneWins + 1
-    } else if (winnerID === contestantTwo) {
+    } else if (wid === c2id) {
         updatedCharTwoWins = updatedCharTwoWins + 1
     }
     let updatedFaceOffs = result.numFaceOffs + 1
