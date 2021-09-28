@@ -8,31 +8,6 @@ const bcrypt = require("bcryptjs")
 
 let validateJWT = require('../middleware/validate-jwt')
 
-//check if user is an admin so they can add characters
-// const authenticate = async (email, password) => {
-//     try {
-//         const user = await UserModel.findOne({
-//             where: {
-//                 email: email,
-//             }
-//         })
-        
-//         if (user) {
-//             let passwordComparison = await bcrypt.compare(password, user.password)
-//             if (passwordComparison) {
-//                 let admin = user.admin
-//                 if (admin === true){
-//                     console.log("admin")
-//                 } else if (admin === false){
-//                     console.log("not an admin")
-//                 }
-//             }
-//         }
-//     } catch(error) {
-//        console.log(error)
-//     }
-// }
-
 //create new character
 router.post("/create", async (req, res) => {
     let { name, imageURL, characterType, email, password } = req.body.character
@@ -82,7 +57,11 @@ router.get("/:id", async (req, res) => {
 
 router.get("/", async(req, res) => {
     try {
-        const results = await CharacterModel.findAll()
+        const results = await CharacterModel.findAll({
+            order: [
+                ['votes', 'DESC']
+            ]
+        })
         res.status(200).json(results)
     } catch (err) {
         res.status(500).json({ error: err })
