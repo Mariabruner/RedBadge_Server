@@ -8,10 +8,36 @@ const bcrypt = require("bcryptjs")
 
 let validateJWT = require('../middleware/validate-jwt')
 
+router.get("/checkAdmin", async (req, res) => {
+    let { id, admin } = req.user
+
+    try {
+        const results = await UserModel.findOne({
+            where: {
+                "id": id,
+                "admin": admin
+            }
+        })
+
+        res.status(201).json({
+            message: "User found",
+            user: results
+        })
+    } catch (err) {
+        console.log(err)
+    }
+})
+
 //create new character
 router.post("/create", async (req, res) => {
-    let { name, imageURL, characterType, email, password } = req.body.character
+    let { name, imageURL, characterType} = req.body.character
+    let { admin } = req.user
 
+    if (admin === false) {
+        res.status(403).json({
+            message: "Not authorized"
+        })
+    }
 
     try {
         const Character = await CharacterModel.create({
