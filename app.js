@@ -1,3 +1,5 @@
+require('dotenv').config()
+
 const Express = require("express")
 const app = Express()
 const dbConnection = require("./db")
@@ -20,7 +22,7 @@ app.use("/fight", controllers.fightController)
 dbConnection.authenticate()
     .then(() => dbConnection.sync()) //{force: true}
     .then(() => {
-        app.listen(3000, () => {
+        app.listen(process.env.PORT, () => {
             console.log(`[Server]: App is listening on 3000.`)
         })
     })
