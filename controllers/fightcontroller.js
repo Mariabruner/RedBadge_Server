@@ -64,13 +64,14 @@ router.post("/create", async (req, res) => {
 // })
 
 //Get a fight combo using both character ids
-router.get("/find", async (req, res) => {
+router.get("/find/:characterOneId/:characterTwoId", async (req, res) => {
+    let {characterOneId, characterTwoId} = req.params
 
     try {
     query = {
         where: {
-            characterOneId: req.body.characterOneId,
-            characterTwoId: req.body.characterTwoId
+            characterOneId: characterOneId,
+            characterTwoId: characterTwoId
         }
     }
         result = await FightModel.findOne(query)

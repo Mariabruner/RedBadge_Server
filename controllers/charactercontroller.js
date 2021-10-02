@@ -81,6 +81,20 @@ router.get("/:id", async (req, res) => {
     }
 })
 
+router.get("/getByName/:name", async(req, res) => {
+    const { name } = req.params
+
+    try {
+        const results = await CharacterModel.findOne({
+            where: { name: name }
+        })
+        res.status(200).json(results)
+    } catch (err) {
+        console.log(err)
+        res.status(500).json({ error: err })
+    }
+})
+
 router.get("/", async(req, res) => {
     try {
         const results = await CharacterModel.findAll({
