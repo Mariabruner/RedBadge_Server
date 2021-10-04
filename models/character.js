@@ -8,7 +8,7 @@ const Character = db.define("character", {
         unique: true    
     },
     imageURL: {
-        type: DataTypes.STRING(10000),
+        type: DataTypes.STRING(20000),
         allowNull: false,
     },
     characterType: {
