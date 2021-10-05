@@ -1,6 +1,7 @@
 const UserModel = require("./user")
 const CharacterModel = require("./character")
 const FightModel = require("./fight")
+const SuggestionModel = require("./suggestion")
 
 
 // CharacterModel.hasMany(FightModel, {foreignKey: "characterOneId"});
@@ -10,4 +11,5 @@ const FightModel = require("./fight")
 module.exports = {  
     UserModel, 
     CharacterModel, 
-    FightModel }
+    FightModel,
+    SuggestionModel }

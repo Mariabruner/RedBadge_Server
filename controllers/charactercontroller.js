@@ -109,6 +109,9 @@ router.get("/", async(req, res) => {
 })
 
 
+
+
+
 //update characters fight appearances
 router.put("/updateFights/:id", async (req, res) => {
     const { id } = req.params
